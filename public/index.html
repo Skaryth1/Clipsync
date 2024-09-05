@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 600px; margin: 0 auto; }
+        input, button { width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; }
+        button { background-color: #1da1f2; color: #fff; border: none; cursor: pointer; }
+        button:hover { background-color: #1a91da; }
+        p { color: red; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Login</h1>
+        <input type="text" id="username" placeholder="Usuário">
+        <input type="password" id="password" placeholder="Senha">
+        <button id="loginButton">Entrar</button>
+        <p id="error"></p>
+        <a href="register.html">Cadastrar</a>
+    </div>
+    <script>
+        document.getElementById('loginButton').addEventListener('click', async () => {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const response = await fetch('/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+            if (response.ok) {
+                localStorage.setItem('username', username);
+                window.location.href = 'timeline.html'; // Redireciona para a página de timeline
+            } else {
+                const errorText = await response.text();
+                document.getElementById('error').textContent = errorText;
+            }
+        });
+    </script>
+</body>
+</html>

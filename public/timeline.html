@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timeline</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f5f8fa; }
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        header { background: #1da1f2; color: #fff; padding: 10px; text-align: center; }
+        textarea { width: 100%; padding: 10px; margin: 10px 0; border-radius: 20px; border: 1px solid #e1e8ed; }
+        button { background-color: #1da1f2; color: #fff; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; }
+        button:hover { background-color: #1a91da; }
+        .post { border: 1px solid #e1e8ed; border-radius: 20px; background: #fff; padding: 15px; margin-bottom: 15px; }
+        .post p { margin: 0; }
+        .post .username { font-weight: bold; color: #1da1f2; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Clipsy</h1>
+        <button onclick="logout()">Logout</button>
+    </header>
+    <div class="container">
+        <textarea id="postContent" placeholder="O que está acontecendo?"></textarea>
+        <button id="postButton">Tweetar</button>
+        <div id="posts"></div>
+    </div>
+    <script>
+        // Verificar se o usuário está logado
+        if (!localStorage.getItem('username')) {
+            window.location.href = 'index.html'; // Redireciona para a página de login
+        }
+
+        // Função para carregar postagens
+        async function loadPosts() {
+            const response = await fetch('/posts');
+            const posts = await response.json();
+            document.getElementById('posts').innerHTML = posts.map(post => 
+                `<div class="post"><p><span class="username">${post.user}</span>: ${post.content}</p></div>`
+            ).join('');
+        }
+
+        // Carregar postagens ao carregar a página
+        loadPosts();
+
+        // Enviar nova postagem
+        document.getElementById('postButton').addEventListener('click', async () => {
+            const content = document.getElementById('postContent').value;
+            const username = localStorage.getItem('username');
+            const response = await fetch('/post', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, content })
+            });
+            if (response.ok) {
+                document.getElementById('postContent').value = '';
+                loadPosts(); // Recarregar postagens após postagem
+            } else {
+                alert('Erro ao postar mensagem');
+            }
+        });
+
+        // Função para fazer logout
+        function logout() {
+            localStorage.removeItem('username');
+            window.location.href = 'index.html'; // Redireciona para a página de login
+        }
+    </script>
+</body>
+</html>
